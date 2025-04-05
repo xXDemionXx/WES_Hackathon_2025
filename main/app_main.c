@@ -37,7 +37,7 @@ static const char *TAG = "main task";
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
 void app_main(void)
 {
-    //gui_init();
+    gui_init();
     hardware_init();
     //wifi_init();
 
