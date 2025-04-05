@@ -17,6 +17,7 @@
 #include <esp_netif.h>
 #include <esp_wifi.h>
 #include "BSP/include/hcsr04.h"
+#include "BSP/include/TCRT5000.h"  
 #include "driver/gpio.h"
 
 
@@ -102,6 +103,26 @@ void sensor_task(void *pvParameters)
     }
 }
 
+void tcrt5000_task(void *pvParameters)
+{
+    tcrt5000_t sensor;
+    // Initialize the sensor on ADC1 channel 6 (update this according to your wiring)
+    if (tcrt5000_init(&sensor, ADC1_CHANNEL_6) != 0) {
+        printf("Failed to initialize TCRT5000 sensor\n");
+        vTaskDelete(NULL);
+    }
+    
+    while (1) {
+        float distance = tcrt5000_get_distance(&sensor);
+        if (distance < 0) {
+            printf("Error reading sensor value\n");
+        } else {
+            printf("TCRT5000 Distance: %.2f mm\n", distance);
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));  // Delay 1 second between measurements
+    }
+}
+
 
 //------------------------------- GLOBAL DATA ---------------------------------
 
@@ -109,7 +130,9 @@ void sensor_task(void *pvParameters)
 void app_main(void)
 {
     // Create the dedicated WiFi task
-    xTaskCreate(sensor_task, "SensorTask", 4096, NULL, 5, NULL);
+    //xTaskCreate(sensor_task, "SensorTask", 4096, NULL, 5, NULL);
+    xTaskCreate(tcrt5000_task, "TCRT5000_Task", 4096, NULL, 5, NULL);
+
     //xTaskCreate(wifi_task, "wifi_task", 4096, NULL, 5, NULL);
 }
 
