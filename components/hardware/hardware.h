@@ -15,6 +15,51 @@ extern "C" {
 
 //---------------------------------- MACROS -----------------------------------
 
+#define HARDWARE_SEND_QUEUE_LENGTH         5
+
+/**
+ * @brief Structure that will be sent over the queue.
+ * 
+ */
+typedef enum{
+    BUTTONS,
+    JOYSTICK
+}hardware_send_message_t;
+
+typedef struct{
+    uint8_t button1;
+    uint8_t button2;
+}buttons_data_t;
+
+typedef struct{
+    uint8_t x_axis;
+    uint8_t y_axis;
+}joystick_data_t;
+
+typedef union{  // Depending on the enum we want to send different data
+    buttons_data_t buttons_data;
+    joystick_data_t joystick_data;
+}hardware_send_message_data_t;
+
+typedef struct{
+    hardware_send_message_t message_type;
+    hardware_send_message_data_t data;
+}hardware_send_queue_data_t;
+
+
+
+#define HARDWARE_RECEIVE_QUEUE_LENGTH         5
+
+
+
+
+
+/**
+ * @brief Structure that will be received over the queue.
+ * 
+ */
+
+
 //-------------------------------- DATA TYPES ---------------------------------
 
 //---------------------- PUBLIC FUNCTION PROTOTYPES --------------------------
@@ -24,6 +69,8 @@ extern "C" {
  * 
  */
 void hardware_init(void);
+
+QueueHandle_t get_hardware_send_queue(void);
 
 #ifdef __cplusplus
 }

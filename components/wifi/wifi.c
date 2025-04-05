@@ -19,7 +19,7 @@ static void wifi_task(void *p_param)
 
     for(;;)
     {
-        printf("wifi task\n");
+        //printf("wifi task\n");
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }

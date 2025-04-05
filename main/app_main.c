@@ -22,18 +22,38 @@
 //-------------------------------- DATA TYPES ---------------------------------
 
 //---------------------- PRIVATE FUNCTION PROTOTYPES --------------------------
-
+static void main_task(void *p_param);
 //------------------------- STATIC DATA & CONSTANTS ---------------------------
+QueueHandle_t queue_from_hardware;
+hardware_send_queue_data_t hardware_data;
 
 //------------------------------- GLOBAL DATA ---------------------------------
 
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
 void app_main(void)
 {
-    //Demion test
-    gui_init();
+    //gui_init();
     hardware_init();
-    wifi_init();
+    //wifi_init();
+    xTaskCreate(&main_task, "Main_Task", 2048, NULL, 5, NULL);
+}
+
+static void main_task(void *p_param)
+{
+    (void)p_param;
+
+    queue_from_hardware = get_hardware_send_queue();
+
+
+    for(;;)
+    {
+        if (xQueueReceive(queue_from_hardware, &hardware_data, portMAX_DELAY)) {
+            //printf("Received from queue: %d\n", hardware_data);
+            printf("Received from hardware task: %d\n", hardware_data.data.buttons_data.button1);
+        }
+        //printf("main task\n");
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
 }
 
 
