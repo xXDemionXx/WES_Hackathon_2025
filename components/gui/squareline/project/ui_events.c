@@ -13,3 +13,5 @@ void btn_clicked(lv_event_t *e)
 void spin_btn_event_handler(lv_event_t * e)
 {
 }
+
+

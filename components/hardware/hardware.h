@@ -23,9 +23,11 @@ extern "C" {
  * 
  */
 typedef enum{
+    UL_SENSOR,
     BUTTONS,
-    JOYSTICK
+    JOYSTICK,
 }hardware_send_message_t;
+    SPEAKER_SPEED
 
 typedef struct{
     uint8_t button1;
@@ -37,9 +39,14 @@ typedef struct{
     uint8_t y_axis;
 }joystick_data_t;
 
+typedef struct{
+    uint8_t distance;
+}ultrasonic_data_t;
+
 typedef union{  // Depending on the enum we want to send different data
     buttons_data_t buttons_data;
     joystick_data_t joystick_data;
+    ultrasonic_data_t ultrasonic_data;
 }hardware_send_message_data_t;
 
 typedef struct{

@@ -1,10 +1,12 @@
 #ifndef HCSR04_H
 #define HCSR04_H
+#include "driver/gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#define US_TRIGGER_PIN GPIO_NUM_26
+#define US_ECHO_PIN GPIO_NUM_27
 /**
  * @brief Structure representing an HC-SR04 sensor instance.
  */

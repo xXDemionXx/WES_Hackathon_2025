@@ -10,29 +10,18 @@ extern QueueHandle_t s_queue_handle;
 #define TASK_DELAY_MS (1000U)
 #endif
 
-int test_var = 0;
+int car_distance_level = 0;
 
-
-static const char *TAG = "queue_example";
 
 void ui_queue_task(void *p_param)
 {
     (void)p_param;
-    uint32_t count = 0;
     for (;;)
     {
-        if (pdTRUE == xQueueSend(s_queue_handle, &count, pdMS_TO_TICKS(10)))
-        {
-            ESP_LOGI(TAG, "[Producer] Sent value: %lu", count);
-            count++;
-        }
-        vTaskDelay(TASK_DELAY_MS / portTICK_PERIOD_MS);
-
-
+    
         // Receive data from GUI
-        if (xQueueReceive(s_queue_handle, &test_var, pdMS_TO_TICKS(10))) {
-            printf("Received from gui task: %d\n", test_var);
-            //ESP_LOGI(TAG, "[Producer] Sent value: %lu", count);
+        if (xQueueReceive(s_queue_handle, &car_distance_level, pdMS_TO_TICKS(10))) {
+            printf("Received from gui task: %d\n", car_distance_level);
         }
     }
 }

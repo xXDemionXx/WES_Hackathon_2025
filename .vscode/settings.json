@@ -5,6 +5,7 @@
         "hardware.h": "c",
         "gui.h": "c",
         "compare": "c",
-        "cstdint": "c"
+        "cstdint": "c",
+        "hcsr04.h": "c"
     }
 }

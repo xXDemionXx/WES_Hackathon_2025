@@ -42,6 +42,7 @@ gui_send_queue_data_t gui_data;
 gui_receive_queue_data_t data_for_gui;
  
 int test_send_to_gui = 35;
+static int danger_lv = 0;
  
 static const char *TAG = "main task";
 //------------------------------- GLOBAL DATA ---------------------------------
@@ -84,19 +85,25 @@ static void main_task(void *p_param)
     {
         // Receive data from hardware
         if (xQueueReceive(queue_from_hardware, &hardware_data, pdMS_TO_TICKS(WAIT_FOR_QUEUE))) {
-            printf("Received from hardware task: %d\n", hardware_data.data.buttons_data.button1);
-            //ESP_LOGI(TAG, "[Producer] Sent value: %lu", count);
+
+            if (hardware_data.message_type == UL_SENSOR) {
+                printf("Received from hardware task: %d\n", hardware_data.data.ultrasonic_data.distance);
+                danger_lv = (int)hardware_data.data.ultrasonic_data.distance / 20;
+
+                 // Send data to GUI
+                if (xQueueSend(s_queue_handle, &danger_lv, pdMS_TO_TICKS(WAIT_FOR_QUEUE))) {
+                printf("Test send to GUI\n");
+                }
+
+            } else if (hardware_data.message_type == 2) {
+                printf("Received from hardware task: %d\n", hardware_data.data.joystick_data.x_axis);
+            }
         }
  
  
         // Send data to hardware
         if (xQueueSend(queue_for_hardware, &data_for_hardware, pdMS_TO_TICKS(WAIT_FOR_QUEUE))) {
             printf("Sending to hardware task\n");
-        }
- 
-        // Send data to GUI
-        if (xQueueSend(s_queue_handle, &test_send_to_gui, pdMS_TO_TICKS(WAIT_FOR_QUEUE))) {
-            printf("Test send to GUI\n");
         }
  
  
