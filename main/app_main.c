@@ -16,6 +16,8 @@
 #include <esp_log.h>
 #include <esp_netif.h>
 #include <esp_wifi.h>
+#include "BSP/include/hcsr04.h"
+#include "driver/gpio.h"
 
 
 #include <nvs_flash.h>
@@ -83,6 +85,23 @@ void wifi_task(void *pvParameters)
     }
 }
 
+void sensor_task(void *pvParameters)
+{
+    hc_sr04_t sensor;
+    // Initialize sensor on chosen GPIO pins (update with your actual pin numbers)
+    hc_sr04_init(&sensor, GPIO_NUM_18, GPIO_NUM_19);
+
+    while (1) {
+        float distance = hc_sr04_measure_distance(&sensor);
+        if (distance < 0) {
+            printf("Error measuring distance.\n");
+        } else {
+            printf("Measured Distance: %.2f cm\n", distance);
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));  // Delay for 1 second between measurements
+    }
+}
+
 
 //------------------------------- GLOBAL DATA ---------------------------------
 
@@ -90,7 +109,8 @@ void wifi_task(void *pvParameters)
 void app_main(void)
 {
     // Create the dedicated WiFi task
-    xTaskCreate(wifi_task, "wifi_task", 4096, NULL, 5, NULL);
+    xTaskCreate(sensor_task, "SensorTask", 4096, NULL, 5, NULL);
+    //xTaskCreate(wifi_task, "wifi_task", 4096, NULL, 5, NULL);
 }
 
 
