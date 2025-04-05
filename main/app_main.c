@@ -17,6 +17,7 @@
 #include "hardware/hardware.h"
 #include "wifi/wifi.h"
 #include "main.h"
+#include "gui/squareline/project/ui_queue.h"
 
 //---------------------------------- MACROS -----------------------------------
 
@@ -32,12 +33,15 @@ QueueHandle_t queue_for_hardware = NULL;    // Queue handle for the queue that s
 hardware_send_queue_data_t hardware_data;
 hardware_receive_queue_data_t data_for_hardware;
 
+QueueHandle_t s_queue_handle = NULL;
+
 //GUI
 QueueHandle_t queue_from_gui = NULL;        // Queue handle for the queue that receives from gui task
 QueueHandle_t queue_for_gui = NULL;         // Queue handle for the queue that sends to gui task
 gui_send_queue_data_t gui_data;
 gui_receive_queue_data_t data_for_gui;
 
+int test_send_to_gui = 35;
 
 static const char *TAG = "main task";
 //------------------------------- GLOBAL DATA ---------------------------------
@@ -48,6 +52,14 @@ void app_main(void)
     gui_init();
     hardware_init();
     //wifi_init();
+
+    s_queue_handle = xQueueCreate(5, sizeof(uint32_t));
+    if (NULL == s_queue_handle)
+     {
+         ESP_LOGE(TAG, "Failed to create queue");
+         return;
+     }
+     xTaskCreate(&ui_queue_task, "ui_queue_task", 2048, NULL, 5, NULL);
 
     data_for_hardware.message_type = 1;
     data_for_hardware.data.command1.button1 = 21;
@@ -93,6 +105,12 @@ static void main_task(void *p_param)
         if (xQueueSend(queue_for_gui, &data_for_gui, pdMS_TO_TICKS(WAIT_FOR_QUEUE))) {
             printf("Sending to hardware task\n");
         }
+
+        // Send data to GUI
+        if (xQueueSend(s_queue_handle, &test_send_to_gui, pdMS_TO_TICKS(WAIT_FOR_QUEUE))) {
+            printf("Test send to GUI\n");
+        }
+
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
