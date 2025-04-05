@@ -33,13 +33,14 @@ void ui_event_CasinoButton(lv_event_t * e);
 extern lv_obj_t * ui_CasinoButton;
 extern lv_obj_t * ui_CasinoLabel;
 extern lv_obj_t * ui_Image2;
-extern lv_obj_t * ui_Image3;
-extern lv_obj_t * ui_Image1;
-extern lv_obj_t * ui_Image4;
-extern lv_obj_t * ui_Image5;
-extern lv_obj_t * ui_Image6;
-extern lv_obj_t * ui_Image7;
+extern lv_obj_t * ui_bigarcr;
+extern lv_obj_t * ui_bigarcl;
+extern lv_obj_t * ui_midarcr;
+extern lv_obj_t * ui_midarcl;
+extern lv_obj_t * ui_smallarcr;
+extern lv_obj_t * ui_smallarcl;
 // CUSTOM VARIABLES
+extern lv_obj_t * uic_midarc;
 
 // SCREEN: ui_StocksScreen
 void ui_StocksScreen_screen_init(void);

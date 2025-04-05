@@ -10,9 +10,6 @@ SET(SOURCES screens/ui_Home_Scr.c
     images/ui_img_arc_mid_png.c
     images/ui_img_arc_small_png.c
     fonts/ui_font_Font1.c
-    fonts/ui_font_FontStocks.c
-    
-    ui_queue.c
-    )
+    fonts/ui_font_FontStocks.c)
 
 add_library(ui ${SOURCES})

@@ -27,7 +27,6 @@ typedef enum{
     BUTTONS,
     JOYSTICK,
 }hardware_send_message_t;
-    SPEAKER_SPEED
 
 typedef struct{
     uint8_t button1;
