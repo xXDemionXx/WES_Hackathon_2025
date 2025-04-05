@@ -149,4 +149,15 @@ static void _gui_task(void *p_parameter)
     vTaskDelete(NULL);
 }
 
+/*
+QueueHandle_t get_gui_send_queue(void){
+    return 0;
+}
+
+QueueHandle_t get_gui_receive_queue(void){
+    return 0;
+}
+*/
+
+
 //---------------------------- INTERRUPT HANDLERS -----------------------------
