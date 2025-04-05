@@ -23,7 +23,7 @@ extern "C" {
  * @brief Initializes LVGL, TFT drivers and input drivers and starts task needed for GUI operation.
  * 
  */
-void gui_init(void);
+//void gui_init(void);
 
 #ifdef __cplusplus
 }

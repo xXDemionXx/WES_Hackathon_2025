@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 //--------------------------------- INCLUDES ----------------------------------
-
+#include "freertos/queue.h"
 //---------------------------------- MACROS -----------------------------------
 
 #define GUI_SEND_QUEUE_LENGTH               5
@@ -92,10 +92,10 @@ typedef struct{
  */
 void gui_init(void);
 
-/*
-QueueHandle_t get_gui_send_queue(void);
-QueueHandle_t get_gui_receive_queue(void);
-*/
+
+//QueueHandle_t get_gui_send_queue(void);
+//QueueHandle_t get_gui_receive_queue(void);
+
 
 #ifdef __cplusplus
 }
