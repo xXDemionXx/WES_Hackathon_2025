@@ -7,7 +7,7 @@
 
 
 static QueueHandle_t hardware_send_to_main = NULL;  // Queue handle for the queue that sends to main task
-QueueHandle_t hardware_receive_from_main = NULL;  // Queue handle for the queue that receives to hardware task
+static QueueHandle_t hardware_receive_from_main = NULL;  // Queue handle for the queue that receives to hardware task
 
 
 
@@ -61,7 +61,6 @@ static void hardware_task(void *p_param)
             printf("(Hardware) Received from main task: %d\n", hardware_received_data.data.command1.button1);
         }
         //vTaskDelay(1000 / portTICK_PERIOD_MS);
-
 
         if (pdTRUE == xQueueSend(hardware_send_to_main, &hardware_send_data, pdMS_TO_TICKS(HARDWARE_SEND_QUEUE_WAIT)))
         {

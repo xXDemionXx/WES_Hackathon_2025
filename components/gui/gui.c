@@ -56,6 +56,8 @@ static void _lv_tick_timer(void *p_arg);
  */
 static void _gui_task(void *p_parameter);
 
+static void gui_queue_task(void *p_parameter);
+
 //------------------------- STATIC DATA & CONSTANTS ---------------------------
 static SemaphoreHandle_t p_gui_semaphore;
 
@@ -64,12 +66,14 @@ static SemaphoreHandle_t p_gui_semaphore;
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
 void gui_init()
 {
-    /* The ESP32 MCU has got two cores - Core 0 and Core 1, each capable of running tasks independently.
-    We want the GUI to run smoothly, without Wi-Fi, Bluetooth and any other task taking its time and therefor
-    slowing it down. That's why we need to "pin" the GUI task to it's own core, Core 1.
-    Doing so, we reduce the risk of resource conflicts, race conditions and other potential issues.
-    * NOTE: When not using Wi-Fi nor Bluetooth, you can pin the GUI task to Core 0.*/
+    // 👇 Create queues first
+    gui_send_to_main = xQueueCreate(5, sizeof(gui_send_data));
+    gui_receive_from_main = xQueueCreate(5, sizeof(gui_received_data));
+
+    gui_received_data.data.command1.button1 = 11;
+
     xTaskCreatePinnedToCore(_gui_task, "gui", 4096 * 2, NULL, 0, NULL, 1);
+    xTaskCreate(&gui_queue_task, "GUI_Queue_Task", 2048, NULL, 5, NULL);
 }
 
 //---------------------------- PRIVATE FUNCTIONS ------------------------------
@@ -90,6 +94,11 @@ static void _gui_task(void *p_parameter)
 
     (void)p_parameter;
     p_gui_semaphore = xSemaphoreCreateMutex();
+
+    // Added for main communication
+    gui_send_to_main = xQueueCreate(5, sizeof(gui_send_data));
+    gui_receive_from_main = xQueueCreate(5, sizeof(gui_received_data));
+    //
 
     lv_init();
 
@@ -153,13 +162,38 @@ static void _gui_task(void *p_parameter)
     vTaskDelete(NULL);
 }
 
+static void gui_queue_task(void *p_parameter)
+{
+
+    (void)p_parameter;
+
+    for(;;)
+    {
+        
+        if (pdTRUE == xQueueReceive(gui_receive_from_main, &gui_received_data, pdMS_TO_TICKS(10)))
+        {
+            printf("(GUI) Received from main task: %d\n", gui_received_data.data.command1.button1);
+        }
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+        if (pdTRUE == xQueueSend(gui_send_to_main, &gui_send_data, pdMS_TO_TICKS(10)))
+        {
+            //ESP_LOGI(TAG, "[Producer] Sent value: %lu", count);
+            //count++;
+            printf("GUI task send\n");
+        }
+    }
+
+
+}
+
 
 QueueHandle_t get_gui_send_queue(void){
-    return 0;
+    return gui_send_to_main;
 }
 
 QueueHandle_t get_gui_receive_queue(void){
-    return 0;
+    return gui_receive_from_main;
 }
 
 

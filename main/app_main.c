@@ -52,6 +52,9 @@ void app_main(void)
     data_for_hardware.message_type = 1;
     data_for_hardware.data.command1.button1 = 21;
 
+    data_for_gui.message_type = 1;
+    data_for_hardware.data.command1.button1= 55;
+
     xTaskCreate(&main_task, "Main_Task", 2048, NULL, 5, NULL);
 }
 
@@ -61,6 +64,9 @@ static void main_task(void *p_param)
 
     queue_from_hardware = get_hardware_send_queue();
     queue_for_hardware = get_hardware_receive_queue();
+
+    queue_from_gui = get_gui_send_queue();
+    queue_for_gui = get_gui_receive_queue();
 
     //queue_from_gui = get_gui_send_queue();
     //queue_for_gui = get_gui_receive_queue();
@@ -87,6 +93,7 @@ static void main_task(void *p_param)
         if (xQueueSend(queue_for_gui, &data_for_gui, pdMS_TO_TICKS(WAIT_FOR_QUEUE))) {
             printf("Sending to hardware task\n");
         }
+
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
