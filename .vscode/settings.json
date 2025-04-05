@@ -3,6 +3,8 @@
     "idf.flashType": "UART",
     "files.associations": {
         "hardware.h": "c",
-        "gui.h": "c"
+        "gui.h": "c",
+        "compare": "c",
+        "cstdint": "c"
     }
 }
