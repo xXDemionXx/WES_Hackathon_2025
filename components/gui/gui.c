@@ -31,7 +31,11 @@
 #define LV_TICK_PERIOD_MS (1U)
 
 //-------------------------------- DATA TYPES ---------------------------------
+gui_send_queue_data_t gui_send_data;          // Data that is sent over the queue to main task
+gui_receive_queue_data_t gui_received_data;  // Data that is received over the queue from main task
 
+static QueueHandle_t gui_send_to_main = NULL;  // Queue handle for the queue that sends to main task
+static QueueHandle_t gui_receive_from_main = NULL;  // Queue handle for the queue that receives to hardware task
 //---------------------- PRIVATE FUNCTION PROTOTYPES --------------------------
 /**
  * @brief Initializes GUI application.
@@ -149,7 +153,7 @@ static void _gui_task(void *p_parameter)
     vTaskDelete(NULL);
 }
 
-/*
+
 QueueHandle_t get_gui_send_queue(void){
     return 0;
 }
@@ -157,7 +161,7 @@ QueueHandle_t get_gui_send_queue(void){
 QueueHandle_t get_gui_receive_queue(void){
     return 0;
 }
-*/
+
 
 
 //---------------------------- INTERRUPT HANDLERS -----------------------------

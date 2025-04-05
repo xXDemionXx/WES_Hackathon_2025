@@ -15,6 +15,9 @@ extern "C" {
 #endif
 
 //--------------------------------- INCLUDES ----------------------------------
+
+#include "freertos/FreeRTOS.h"
+
 #include "freertos/queue.h"
 //---------------------------------- MACROS -----------------------------------
 
@@ -93,8 +96,8 @@ typedef struct{
 void gui_init(void);
 
 
-//QueueHandle_t get_gui_send_queue(void);
-//QueueHandle_t get_gui_receive_queue(void);
+QueueHandle_t get_gui_send_queue(void);
+QueueHandle_t get_gui_receive_queue(void);
 
 
 #ifdef __cplusplus
