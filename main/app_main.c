@@ -30,6 +30,7 @@
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
 void app_main(void)
 {
+    //Demion test
     gui_init();
     hardware_init();
     wifi_init();
