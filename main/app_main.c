@@ -16,6 +16,7 @@
 #include "gui/gui.h"
 #include "hardware/hardware.h"
 #include "wifi/wifi.h"
+#include "main.h"
 
 //---------------------------------- MACROS -----------------------------------
 
@@ -25,8 +26,12 @@
 static void main_task(void *p_param);
 //------------------------- STATIC DATA & CONSTANTS ---------------------------
 QueueHandle_t queue_from_hardware;
-hardware_send_queue_data_t hardware_data;
+QueueHandle_t queue_for_hardware = NULL;  // Queue handle for the queue that sends to hardware task
 
+hardware_send_queue_data_t hardware_data;
+hardware_receive_queue_data_t data_for_hardware;
+
+static const char *TAG = "main task";
 //------------------------------- GLOBAL DATA ---------------------------------
 
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
@@ -35,6 +40,10 @@ void app_main(void)
     //gui_init();
     hardware_init();
     //wifi_init();
+
+    data_for_hardware.message_type = 1;
+    data_for_hardware.data.command1.button1 = 21;
+
     xTaskCreate(&main_task, "Main_Task", 2048, NULL, 5, NULL);
 }
 
@@ -43,15 +52,21 @@ static void main_task(void *p_param)
     (void)p_param;
 
     queue_from_hardware = get_hardware_send_queue();
-
+    queue_for_hardware = get_hardware_receive_queue();
 
     for(;;)
     {
-        if (xQueueReceive(queue_from_hardware, &hardware_data, portMAX_DELAY)) {
-            //printf("Received from queue: %d\n", hardware_data);
+        // Receive data from hardware
+        if (xQueueReceive(queue_from_hardware, &hardware_data, pdMS_TO_TICKS(WAIT_FOR_QUEUE))) {
             printf("Received from hardware task: %d\n", hardware_data.data.buttons_data.button1);
+            //ESP_LOGI(TAG, "[Producer] Sent value: %lu", count);
         }
-        //printf("main task\n");
+        //vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+        // Send data to hardware
+        if (xQueueSend(queue_for_hardware, &data_for_hardware, pdMS_TO_TICKS(WAIT_FOR_QUEUE))) {
+            printf("Sending to hardware task\n");
+        }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }

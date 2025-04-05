@@ -15,7 +15,8 @@ extern "C" {
 
 //---------------------------------- MACROS -----------------------------------
 
-#define HARDWARE_SEND_QUEUE_LENGTH         5
+#define HARDWARE_SEND_QUEUE_LENGTH              5
+#define HARDWARE_SEND_QUEUE_WAIT                100
 
 /**
  * @brief Structure that will be sent over the queue.
@@ -48,7 +49,38 @@ typedef struct{
 
 
 
-#define HARDWARE_RECEIVE_QUEUE_LENGTH         5
+#define HARDWARE_RECEIVE_QUEUE_LENGTH           5
+#define HARDWARE_RECEIVE_QUEUE_WAIT             10
+
+/**
+ * @brief Structure that will be received over the queue.
+ * 
+ */
+typedef enum{
+    COMMAND1,
+    COMMAND2
+}hardware_receive_message_t;
+
+typedef struct{
+    uint8_t button1;
+    uint8_t button2;
+}command1_data_t;
+
+typedef struct{
+    uint8_t x_axis;
+    uint8_t y_axis;
+}comman2_data_t;
+
+typedef union{  // Depending on the enum we want to send different data
+    command1_data_t command1;
+    comman2_data_t command2;
+}hardware_receive_message_data_t;
+
+typedef struct{
+    hardware_receive_message_t message_type;
+    hardware_receive_message_data_t data;
+}hardware_receive_queue_data_t;
+
 
 
 
@@ -71,6 +103,7 @@ typedef struct{
 void hardware_init(void);
 
 QueueHandle_t get_hardware_send_queue(void);
+QueueHandle_t get_hardware_receive_queue(void);
 
 #ifdef __cplusplus
 }
