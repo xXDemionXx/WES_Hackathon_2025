@@ -32,6 +32,7 @@ void app_main(void)
 {
     gui_init();
     hardware_init();
+    //Niski ljudi
     wifi_init();
 }
 
