@@ -39,10 +39,6 @@ void app_main(void)
 {
     //gui_init();
     hardware_init();
-<<<<<<< HEAD
-    //Niski ljudi
-    wifi_init();
-=======
     //wifi_init();
 
     data_for_hardware.message_type = 1;
@@ -73,7 +69,6 @@ static void main_task(void *p_param)
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
->>>>>>> 9135ba0788cc6778c7e3861b557702bfae63e44f
 }
 
 
