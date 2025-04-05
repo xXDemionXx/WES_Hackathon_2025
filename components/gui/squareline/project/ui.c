@@ -25,13 +25,14 @@ void ui_event_CasinoButton(lv_event_t * e);
 lv_obj_t * ui_CasinoButton;
 lv_obj_t * ui_CasinoLabel;
 lv_obj_t * ui_Image2;
-lv_obj_t * ui_Image3;
-lv_obj_t * ui_Image1;
-lv_obj_t * ui_Image4;
-lv_obj_t * ui_Image5;
-lv_obj_t * ui_Image6;
-lv_obj_t * ui_Image7;
+lv_obj_t * ui_bigarcr;
+lv_obj_t * ui_bigarcl;
+lv_obj_t * ui_midarcr;
+lv_obj_t * ui_midarcl;
+lv_obj_t * ui_smallarcr;
+lv_obj_t * ui_smallarcl;
 // CUSTOM VARIABLES
+lv_obj_t * uic_midarc;
 
 // SCREEN: ui_StocksScreen
 void ui_StocksScreen_screen_init(void);

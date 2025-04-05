@@ -140,13 +140,13 @@ static void _gui_task(void *p_parameter)
         {
             lv_task_handler();
             xSemaphoreGive(p_gui_semaphore);
-        }
     }
 
     /* A task should NEVER return */
     free(p_buf1);
     free(p_buf2);
     vTaskDelete(NULL);
+    }
 }
 
 //---------------------------- INTERRUPT HANDLERS -----------------------------
