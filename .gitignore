@@ -1,0 +1,11 @@
+# Ignore the build output
+/build/
+
+# ESP-IDF specific
+sdkconfig
+sdkconfig.old
+
+# Optional: ignore IDE and OS files
+.vscode/
+*.swp
+.DS_Store
