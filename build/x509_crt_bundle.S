@@ -1,4 +1,4 @@
-/* * Data converted from C:/Users/demio/Documents/WES_Hackathon_2025/build/esp-idf/mbedtls/x509_crt_bundle
+/* * Data converted from C:/Users/Karlo/Documents/WES_Hackathon_2025/build/esp-idf/mbedtls/x509_crt_bundle
  */
 .data
 .section .rodata.embedded

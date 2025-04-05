@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/demio/Documents/WES_Hackathon_2025
+# Install script for directory: C:/Users/Karlo/Documents/WES_Hackathon_2025
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,12 +34,12 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "C:/Users/demio/.espressif/tools/xtensa-esp32-elf/esp-2022r1-11.2.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-objdump.exe")
+  set(CMAKE_OBJDUMP "C:/Users/Karlo/.espressif/tools/xtensa-esp32-elf/esp-2022r1-11.2.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-objdump.exe")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("C:/Users/demio/Documents/WES_Hackathon_2025/build/esp-idf/cmake_install.cmake")
+  include("C:/Users/Karlo/Documents/WES_Hackathon_2025/build/esp-idf/cmake_install.cmake")
 
 endif()
 
@@ -51,5 +51,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/demio/Documents/WES_Hackathon_2025/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/Karlo/Documents/WES_Hackathon_2025/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
