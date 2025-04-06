@@ -20,6 +20,11 @@ int car_back_distance_level = 0;    // Tells GUI how many bars to display
 static QueueHandle_t hardware_send_to_main = NULL;  // Queue handle for the queue that sends to main task
 QueueHandle_t hardware_receive_from_main = NULL;  // Queue handle for the queue that receives to hardware task
 
+static TaskHandle_t stage1_handle = NULL;
+static TaskHandle_t stage2_handle = NULL;
+static TaskHandle_t stage3_handle = NULL;
+static TaskHandle_t stage4_handle = NULL;
+
 
 
 //---------------------------------- LOCAL VARIABLES -----------------------------------
@@ -28,19 +33,49 @@ hardware_receive_queue_data_t hardware_received_data;  // Data that is received 
 
 //============================================================
 
+static void hardware_task(void *p_param);
 
-#define PI 3.14159265
-#define SAMPLE_RATE 8000
-#define TONE_FREQ 1000
-#define BEEP_DURATION_MS 100
 
-#define STAGE1_GAP 700
-#define STAGE2_GAP 300
-#define STAGE3_GAP 80
-#define STAGE1_TIME 3333
-#define STAGE2_TIME 3333
-#define STAGE3_TIME 3333
-#define STAGE4_TIME 2000
+static void hardware_task(void *p_param)
+{
+    (void)p_param;
+
+    hc_sr04_t sensor; // Create an instance of the hc_sr04_t structure
+    hc_sr04_init(&sensor,US_TRIGGER_PIN,US_ECHO_PIN);       //Ultrasonic sensor initialization
+
+    for(;;)
+    {
+        if (pdTRUE == xQueueReceive(hardware_receive_from_main, &hardware_received_data, pdMS_TO_TICKS(HARDWARE_RECEIVE_QUEUE_WAIT)))
+        {
+            printf("(Hardware) Received from main task: %d\n", hardware_received_data.data.command1.button1);
+        }
+        //vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+        int distance = (int)hc_sr04_measure_distance(&sensor); // Measure distance using the ultrasonic sensor
+
+        if (distance >= 0) {
+
+            distance = distance / 20;
+            
+            if(distance > 3) distance = 3;
+
+            hardware_send_data.message_type = UL_SENSOR; // Set message type to ultrasonic sensor
+            hardware_send_data.data.ultrasonic_data.distance = distance; // Send distance to main task
+
+            if (pdTRUE == xQueueSend(hardware_send_to_main, &hardware_send_data, pdMS_TO_TICKS(HARDWARE_SEND_QUEUE_WAIT)))
+            {
+                printf("Hardware task send distance\n");
+            }
+
+        } else {
+            printf("Error measuring distance\n");
+        }
+
+
+        //printf("hardware task\n");
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
 
 // --- Shared blocking tone generator ---
 void play_beep_blocking(int duration_ms) {
@@ -54,53 +89,42 @@ void play_beep_blocking(int duration_ms) {
 
 // --- Stage 1: Slow Beeps Task ---
 void stage1_task(void *pvParam) {
-    int elapsed = 0;
-    while (elapsed < STAGE1_TIME) {
+    (void)pvParam;
+    for(;;)
+    {
         play_beep_blocking(BEEP_DURATION_MS);
         vTaskDelay(pdMS_TO_TICKS(STAGE1_GAP));
-        elapsed += BEEP_DURATION_MS + STAGE1_GAP;
     }
-    vTaskDelete(NULL);
-}
-void stage1_slow_beeps() {
-    xTaskCreate(stage1_task, "stage1_task", 4096, NULL, 5, NULL);
 }
 
 // --- Stage 2: Medium Beeps Task ---
 void stage2_task(void *pvParam) {
-    int elapsed = 0;
-    while (elapsed < STAGE2_TIME) {
+    (void)pvParam;
+    for(;;)
+    {
         play_beep_blocking(BEEP_DURATION_MS);
         vTaskDelay(pdMS_TO_TICKS(STAGE2_GAP));
-        elapsed += BEEP_DURATION_MS + STAGE2_GAP;
     }
-    vTaskDelete(NULL);
-}
-void stage2_medium_beeps() {
-    xTaskCreate(stage2_task, "stage2_task", 4096, NULL, 5, NULL);
 }
 
 // --- Stage 3: Fast Beeps Task ---
 void stage3_task(void *pvParam) {
-    int elapsed = 0;
-    while (elapsed < STAGE3_TIME) {
+    (void)pvParam;
+    for(;;)
+    {
         play_beep_blocking(BEEP_DURATION_MS);
         vTaskDelay(pdMS_TO_TICKS(STAGE3_GAP));
-        elapsed += BEEP_DURATION_MS + STAGE3_GAP;
     }
-    vTaskDelete(NULL);
-}
-void stage3_fast_beeps() {
-    xTaskCreate(stage3_task, "stage3_task", 4096, NULL, 5, NULL);
 }
 
 // --- Stage 4: Constant Tone Task ---
 void stage4_task(void *pvParam) {
-    play_beep_blocking(STAGE4_TIME);
-    vTaskDelete(NULL);
-}
-void stage4_constant_tone() {
-    xTaskCreate(stage4_task, "stage4_task", 4096, NULL, 5, NULL);
+    (void)pvParam;
+    for(;;)
+    {
+        play_beep_blocking(STAGE4_TIME);
+        vTaskDelay(pdMS_TO_TICKS(STAGE4_GAP));
+    }
 }
 
 // --- app_main for testing ---
@@ -108,7 +132,7 @@ void sound_generator() {
     dac_output_enable(DAC_CHANNEL_1); // GPIO25
 
     // Example: Call one at a time (can trigger from sensor input or state machine)
-    stage1_slow_beeps();
+    //stage1_slow_beeps();
 
     // To test others one-by-one manually, just call:
     //stage2_medium_beeps();
@@ -117,8 +141,23 @@ void sound_generator() {
 }
 //============================================================
 
-static void hardware_task(void *p_param);
+void init_speeker_tasks(void){
 
+    xTaskCreate(&stage1_task, "stage1_task", 4096, NULL, 5, &stage1_handle);
+    xTaskCreate(&stage2_task, "stage2_task", 4096, NULL, 5, &stage2_handle);
+    xTaskCreate(&stage3_task, "stage3_task", 4096, NULL, 5, &stage3_handle);
+    xTaskCreate(&stage4_task, "stage4_task", 4096, NULL, 5, &stage4_handle);
+
+
+    // Suspend the tasks so they don't play right away
+    
+    vTaskSuspend(stage1_handle);
+    vTaskSuspend(stage2_handle);
+    vTaskSuspend(stage3_handle);
+    vTaskSuspend(stage4_handle);
+
+    
+}
 
 
 
@@ -150,43 +189,4 @@ QueueHandle_t get_hardware_send_queue(void) {
 
 QueueHandle_t get_hardware_receive_queue(void) {
     return hardware_receive_from_main;
-}
-
-
-
-static void hardware_task(void *p_param)
-{
-    (void)p_param;
-
-    hc_sr04_t sensor; // Create an instance of the hc_sr04_t structure
-    hc_sr04_init(&sensor,US_TRIGGER_PIN,US_ECHO_PIN);       //Ultrasonic sensor initialization
-
-    for(;;)
-    {
-        if (pdTRUE == xQueueReceive(hardware_receive_from_main, &hardware_received_data, pdMS_TO_TICKS(HARDWARE_RECEIVE_QUEUE_WAIT)))
-        {
-            printf("(Hardware) Received from main task: %d\n", hardware_received_data.data.command1.button1);
-        }
-        //vTaskDelay(1000 / portTICK_PERIOD_MS);
-
-        float distance = hc_sr04_measure_distance(&sensor); // Measure distance using the ultrasonic sensor
-        if (distance >= 0) {
-            printf("Distance: %.2f cm\n", distance);
-            sound_generator();
-
-            hardware_send_data.message_type = UL_SENSOR; // Set message type to ultrasonic sensor
-            hardware_send_data.data.ultrasonic_data.distance = (int)distance; // Send distance to main task
-        } else {
-            printf("Error measuring distance\n");
-        }
-
-
-        if (pdTRUE == xQueueSend(hardware_send_to_main, &hardware_send_data, pdMS_TO_TICKS(HARDWARE_SEND_QUEUE_WAIT)))
-        {
-            //printf("Hardware task send\n");
-        }
-
-        //printf("hardware task\n");
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
 }
