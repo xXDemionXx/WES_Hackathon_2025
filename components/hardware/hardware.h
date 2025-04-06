@@ -132,6 +132,7 @@ void stage4_task(void *pvParam);
 void stage4_constant_tone();
 void sound_generator();
 void init_speeker_tasks(void);
+void play_beep_non_blocking(int duration_ms);
 
 QueueHandle_t get_hardware_send_queue(void);
 QueueHandle_t get_hardware_receive_queue(void);

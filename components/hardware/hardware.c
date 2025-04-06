@@ -16,7 +16,6 @@
 
 int car_back_distance_level = 0;    // Tells GUI how many bars to display
 
-
 static QueueHandle_t hardware_send_to_main = NULL;  // Queue handle for the queue that sends to main task
 QueueHandle_t hardware_receive_from_main = NULL;  // Queue handle for the queue that receives to hardware task
 
@@ -42,6 +41,8 @@ static void hardware_task(void *p_param)
 
     hc_sr04_t sensor; // Create an instance of the hc_sr04_t structure
     hc_sr04_init(&sensor,US_TRIGGER_PIN,US_ECHO_PIN);       //Ultrasonic sensor initialization
+    static int prev_distance = 0;
+
 
     for(;;)
     {
@@ -56,8 +57,46 @@ static void hardware_task(void *p_param)
         if (distance >= 0) {
 
             distance = distance / 20;
-            
+            //vTaskResume(stage4_handle);
+
             if(distance > 3) distance = 3;
+            
+                switch(distance){
+                    case 0:
+                        /*
+                        vTaskSuspend(stage1_handle);
+                        vTaskSuspend(stage2_handle);
+                        vTaskResume(stage3_handle);
+                        */
+                       play_beep_non_blocking(700);
+                    break;
+                    case 1:
+                        /*
+                        vTaskSuspend(stage1_handle);
+                        vTaskResume(stage2_handle);
+                        vTaskSuspend(stage3_handle);
+                        */
+                       play_beep_non_blocking(250);
+                    break;
+                    case 2:
+                        /*
+                        vTaskResume(stage1_handle);
+                        vTaskSuspend(stage2_handle);
+                        vTaskSuspend(stage3_handle);
+                        */
+                       play_beep_non_blocking(75);
+                    break;
+                    case 3:
+                        /*
+                        vTaskSuspend(stage1_handle);
+                        vTaskSuspend(stage2_handle);
+                        vTaskSuspend(stage3_handle);
+                        */
+
+                    break;
+            }
+
+            prev_distance = distance;
 
             hardware_send_data.message_type = UL_SENSOR; // Set message type to ultrasonic sensor
             hardware_send_data.data.ultrasonic_data.distance = distance; // Send distance to main task
@@ -89,12 +128,16 @@ void play_beep_blocking(int duration_ms) {
 
 // --- Stage 1: Slow Beeps Task ---
 void stage1_task(void *pvParam) {
-    (void)pvParam;
-    for(;;)
-    {
+    int elapsed = 0;
+    while (elapsed < STAGE1_TIME) {
         play_beep_blocking(BEEP_DURATION_MS);
         vTaskDelay(pdMS_TO_TICKS(STAGE1_GAP));
+        elapsed += BEEP_DURATION_MS + STAGE1_GAP;
     }
+    vTaskDelete(NULL);
+}
+void stage1_slow_beeps() {
+    xTaskCreate(stage1_task, "stage1_task", 4096, NULL, 5, NULL);
 }
 
 // --- Stage 2: Medium Beeps Task ---
@@ -127,6 +170,31 @@ void stage4_task(void *pvParam) {
     }
 }
 
+static void beep_task(void *pvParameters) {
+    int duration_ms = *((int *)pvParameters);
+    int samples = (SAMPLE_RATE * duration_ms) / 1000;
+    
+    dac_output_enable(DAC_CHANNEL_1);
+
+    for (int i = 0; i < samples; i++) {
+        int value = 128 + (int)(127 * sin(2 * PI * TONE_FREQ * i / SAMPLE_RATE));
+        dac_output_voltage(DAC_CHANNEL_1, value);
+        ets_delay_us(1000000 / SAMPLE_RATE);
+    }
+
+    dac_output_voltage(DAC_CHANNEL_1, 0);  // Turn off tone
+    free(pvParameters);  // Free allocated memory for duration
+    vTaskDelete(NULL);   // Delete the task
+}
+
+void play_beep_non_blocking(int duration_ms) {
+    int *duration = malloc(sizeof(int));
+    if (duration == NULL) return;
+    *duration = duration_ms;
+    
+    xTaskCreate(beep_task, "beep_task", 4096, duration, 5, NULL);
+}
+
 // --- app_main for testing ---
 void sound_generator() {
     dac_output_enable(DAC_CHANNEL_1); // GPIO25
@@ -147,14 +215,16 @@ void init_speeker_tasks(void){
     xTaskCreate(&stage2_task, "stage2_task", 4096, NULL, 5, &stage2_handle);
     xTaskCreate(&stage3_task, "stage3_task", 4096, NULL, 5, &stage3_handle);
     xTaskCreate(&stage4_task, "stage4_task", 4096, NULL, 5, &stage4_handle);
-
-
     // Suspend the tasks so they don't play right away
     
     vTaskSuspend(stage1_handle);
     vTaskSuspend(stage2_handle);
     vTaskSuspend(stage3_handle);
     vTaskSuspend(stage4_handle);
+
+    //vTaskResume(stage4_handle);
+
+    dac_output_enable(DAC_CHANNEL_1); // GPIO25
 
     
 }
@@ -164,6 +234,8 @@ void init_speeker_tasks(void){
 void hardware_init(void){
     hardware_send_data.message_type = 1;
     hardware_send_data.data.buttons_data.button1 = 66;
+
+    init_speeker_tasks();
     
 
     /*

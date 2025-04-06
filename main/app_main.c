@@ -87,13 +87,11 @@ static void main_task(void *p_param)
         if (xQueueReceive(queue_from_hardware, &hardware_data, pdMS_TO_TICKS(WAIT_FOR_QUEUE))) {
 
             if (hardware_data.message_type == UL_SENSOR) {
-                printf("Received from hardware task: %d\n", hardware_data.data.ultrasonic_data.distance);
-                danger_lv = (int)hardware_data.data.ultrasonic_data.distance / 20;
-                if(danger_lv > 3) danger_lv = 3;
-
+                danger_lv = hardware_data.data.ultrasonic_data.distance;
+                printf("Received from hardware task: %d\n", danger_lv);
                  // Send data to GUI
                 if (xQueueSend(s_queue_handle, &danger_lv, pdMS_TO_TICKS(WAIT_FOR_QUEUE))) {
-                printf("Test send to GUI\n");
+                    printf("Test send to GUI\n");
                 }
 
             } else if (hardware_data.message_type == 2) {
