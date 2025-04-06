@@ -10,41 +10,85 @@ void ui_CasinoScreen_screen_init(void)
     ui_CasinoScreen = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_CasinoScreen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    ui_Button7 = lv_btn_create(ui_CasinoScreen);
-    lv_obj_set_width(ui_Button7, 100);
-    lv_obj_set_height(ui_Button7, 50);
-    lv_obj_set_x(ui_Button7, -5);
-    lv_obj_set_y(ui_Button7, -108);
-    lv_obj_set_align(ui_Button7, LV_ALIGN_CENTER);
+    ui_backgroundCasino = lv_img_create(ui_CasinoScreen);
+    lv_img_set_src(ui_backgroundCasino, &ui_img_wood_3_bg_png);
+    lv_obj_set_width(ui_backgroundCasino, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_backgroundCasino, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_backgroundCasino, 0);
+    lv_obj_set_y(ui_backgroundCasino, -4);
+    lv_obj_set_align(ui_backgroundCasino, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_backgroundCasino, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_backgroundCasino, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_img_set_zoom(ui_backgroundCasino, 300);
 
-    ui_Label3 = lv_label_create(ui_Button7);
-    lv_obj_set_width(ui_Label3, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Label3, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_Label3, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Label3, "HOME");
+    ui_HomeButton = lv_btn_create(ui_CasinoScreen);
+    lv_obj_set_width(ui_HomeButton, 100);
+    lv_obj_set_height(ui_HomeButton, 50);
+    lv_obj_set_x(ui_HomeButton, -5);
+    lv_obj_set_y(ui_HomeButton, -108);
+    lv_obj_set_align(ui_HomeButton, LV_ALIGN_CENTER);
+    lv_obj_set_style_bg_color(ui_HomeButton, lv_color_hex(0x434A4A), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_HomeButton, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Button1 = lv_btn_create(ui_CasinoScreen);
-    lv_obj_set_width(ui_Button1, 100);
-    lv_obj_set_height(ui_Button1, 50);
-    lv_obj_set_x(ui_Button1, 104);
-    lv_obj_set_y(ui_Button1, 91);
-    lv_obj_set_align(ui_Button1, LV_ALIGN_CENTER);
+    ui_homeLabel = lv_label_create(ui_HomeButton);
+    lv_obj_set_width(ui_homeLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_homeLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_homeLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_homeLabel, "HOME");
 
-    ui_Label10 = lv_label_create(ui_Button1);
-    lv_obj_set_width(ui_Label10, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Label10, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_Label10, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Label10, "SPIN");
+    ui_leftback = lv_img_create(ui_CasinoScreen);
+    lv_img_set_src(ui_leftback, &ui_img_card_back_png);
+    lv_obj_set_width(ui_leftback, LV_SIZE_CONTENT);   /// 184
+    lv_obj_set_height(ui_leftback, LV_SIZE_CONTENT);    /// 273
+    lv_obj_set_x(ui_leftback, -91);
+    lv_obj_set_y(ui_leftback, -7);
+    lv_obj_set_align(ui_leftback, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_leftback, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_leftback, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_scrollbar_mode(ui_leftback, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_scroll_dir(ui_leftback, LV_DIR_TOP);
 
-    ui_Roller3 = lv_roller_create(ui_CasinoScreen);
-    lv_roller_set_options(ui_Roller3, "Option 1\nOption 2\nOption 3", LV_ROLLER_MODE_NORMAL);
-    lv_obj_set_width(ui_Roller3, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Roller3, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Roller3, -104);
-    lv_obj_set_y(ui_Roller3, 16);
-    lv_obj_set_align(ui_Roller3, LV_ALIGN_CENTER);
+    ui_rightback = lv_img_create(ui_CasinoScreen);
+    lv_img_set_src(ui_rightback, &ui_img_card_back_png);
+    lv_obj_set_width(ui_rightback, LV_SIZE_CONTENT);   /// 184
+    lv_obj_set_height(ui_rightback, LV_SIZE_CONTENT);    /// 273
+    lv_obj_set_x(ui_rightback, 93);
+    lv_obj_set_y(ui_rightback, -7);
+    lv_obj_set_align(ui_rightback, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_rightback, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_rightback, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    lv_obj_add_event_cb(ui_Button7, ui_event_Button7, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_Button1, ui_event_Button1, LV_EVENT_ALL, NULL);
+    ui_midback = lv_img_create(ui_CasinoScreen);
+    lv_img_set_src(ui_midback, &ui_img_card_back_png);
+    lv_obj_set_width(ui_midback, LV_SIZE_CONTENT);   /// 184
+    lv_obj_set_height(ui_midback, LV_SIZE_CONTENT);    /// 273
+    lv_obj_set_x(ui_midback, 2);
+    lv_obj_set_y(ui_midback, -7);
+    lv_obj_set_align(ui_midback, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_midback, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_midback, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_SpinScroll = lv_imgbtn_create(ui_CasinoScreen);
+    lv_imgbtn_set_src(ui_SpinScroll, LV_IMGBTN_STATE_RELEASED, NULL, &ui_img_spin_scroll_png, NULL);
+    lv_imgbtn_set_src(ui_SpinScroll, LV_IMGBTN_STATE_PRESSED, NULL, &ui_img_spin_scroll_png, NULL);
+    lv_obj_set_width(ui_SpinScroll, 122);
+    lv_obj_set_height(ui_SpinScroll, 61);
+    lv_obj_set_x(ui_SpinScroll, 1);
+    lv_obj_set_y(ui_SpinScroll, 102);
+    lv_obj_set_align(ui_SpinScroll, LV_ALIGN_CENTER);
+
+    ui_SpinLabel = lv_label_create(ui_SpinScroll);
+    lv_obj_set_width(ui_SpinLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_SpinLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_SpinLabel, -3);
+    lv_obj_set_y(ui_SpinLabel, -3);
+    lv_obj_set_align(ui_SpinLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_SpinLabel, "SPIN");
+    lv_obj_set_style_text_align(ui_SpinLabel, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_decor(ui_SpinLabel, LV_TEXT_DECOR_UNDERLINE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_SpinLabel, &ui_font_PizzaFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_add_event_cb(ui_HomeButton, ui_event_HomeButton, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_SpinScroll, ui_event_SpinScroll, LV_EVENT_ALL, NULL);
 
 }

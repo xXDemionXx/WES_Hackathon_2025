@@ -21,46 +21,46 @@ void MoveColorToCenter_Animation(lv_obj_t * TargetObject, int delay);
 void MoveSettingsToCenter_Animation(lv_obj_t * TargetObject, int delay);
 void HideBtn_Animation(lv_obj_t * TargetObject, int delay);
 void ShowBtn_Animation(lv_obj_t * TargetObject, int delay);
+void SpinAnimation_Animation(lv_obj_t * TargetObject, int delay);
 
 // SCREEN: ui_Home_Scr
 void ui_Home_Scr_screen_init(void);
 extern lv_obj_t * ui_Home_Scr;
-extern lv_obj_t * ui_ButtonPanelTest1;
-void ui_event_StockMarketButton(lv_event_t * e);
-extern lv_obj_t * ui_StockMarketButton;
-extern lv_obj_t * ui_CasinoLabel1;
-void ui_event_CasinoButton(lv_event_t * e);
-extern lv_obj_t * ui_CasinoButton;
-extern lv_obj_t * ui_CasinoLabel;
-extern lv_obj_t * ui_Image2;
+extern lv_obj_t * ui_Panel7;
+extern lv_obj_t * ui_Panel1;
+extern lv_obj_t * ui_Panel2;
+extern lv_obj_t * ui_teslamain;
 extern lv_obj_t * ui_bigarcr;
 extern lv_obj_t * ui_bigarcl;
 extern lv_obj_t * ui_midarcr;
 extern lv_obj_t * ui_midarcl;
 extern lv_obj_t * ui_smallarcr;
 extern lv_obj_t * ui_smallarcl;
+extern lv_obj_t * ui_barricade1;
+extern lv_obj_t * ui_teslaLight;
+extern lv_obj_t * ui_barricade2;
+extern lv_obj_t * ui_barricade3;
+extern lv_obj_t * ui_barricade4;
+extern lv_obj_t * ui_barricade5;
+void ui_event_CasinoButton(lv_event_t * e);
+extern lv_obj_t * ui_CasinoButton;
+extern lv_obj_t * ui_CasinoLabel;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_midarc;
-
-// SCREEN: ui_StocksScreen
-void ui_StocksScreen_screen_init(void);
-extern lv_obj_t * ui_StocksScreen;
-extern lv_obj_t * ui_Chart1;
-void ui_event_Button6(lv_event_t * e);
-extern lv_obj_t * ui_Button6;
-extern lv_obj_t * ui_Label2;
-// CUSTOM VARIABLES
 
 // SCREEN: ui_CasinoScreen
 void ui_CasinoScreen_screen_init(void);
 extern lv_obj_t * ui_CasinoScreen;
-void ui_event_Button7(lv_event_t * e);
-extern lv_obj_t * ui_Button7;
-extern lv_obj_t * ui_Label3;
-void ui_event_Button1(lv_event_t * e);
-extern lv_obj_t * ui_Button1;
-extern lv_obj_t * ui_Label10;
-extern lv_obj_t * ui_Roller3;
+extern lv_obj_t * ui_backgroundCasino;
+void ui_event_HomeButton(lv_event_t * e);
+extern lv_obj_t * ui_HomeButton;
+extern lv_obj_t * ui_homeLabel;
+extern lv_obj_t * ui_leftback;
+extern lv_obj_t * ui_rightback;
+extern lv_obj_t * ui_midback;
+void ui_event_SpinScroll(lv_event_t * e);
+extern lv_obj_t * ui_SpinScroll;
+extern lv_obj_t * ui_SpinLabel;
 // CUSTOM VARIABLES
 
 // EVENTS
@@ -69,13 +69,16 @@ extern lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
 LV_IMG_DECLARE(ui_img_tesla_png);    // assets/tesla.png
-LV_IMG_DECLARE(ui_img_arc_big_png);    // assets/arc_big.png
-LV_IMG_DECLARE(ui_img_arc_mid_png);    // assets/arc_mid.png
-LV_IMG_DECLARE(ui_img_arc_small_png);    // assets/arc_small.png
+LV_IMG_DECLARE(ui_img_arc_big_2_png);    // assets/arc_big_2.png
+LV_IMG_DECLARE(ui_img_arc_mid_2_png);    // assets/arc_mid_2.png
+LV_IMG_DECLARE(ui_img_arc_small_2_png);    // assets/arc_small_2.png
+LV_IMG_DECLARE(ui_img_wood_3_bg_png);    // assets/wood_3_bg.png
+LV_IMG_DECLARE(ui_img_card_back_png);    // assets/card_back.png
+LV_IMG_DECLARE(ui_img_spin_scroll_png);    // assets/spin_scroll.png
 
 // FONTS
-LV_FONT_DECLARE(ui_font_Font1);
-LV_FONT_DECLARE(ui_font_FontStocks);
+LV_FONT_DECLARE(ui_font_PizzaFont);
+LV_FONT_DECLARE(ui_font_PizzaFontSmall);
 
 // UI INIT
 void ui_init(void);

@@ -10,8 +10,6 @@
 extern "C" {
 #endif
 
-void spin_btn_event_handler(lv_event_t * e);
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
