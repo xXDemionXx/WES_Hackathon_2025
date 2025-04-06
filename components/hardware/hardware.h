@@ -25,12 +25,22 @@ extern "C" {
 
 #define STAGE1_GAP 700
 #define STAGE2_GAP 300
-#define STAGE3_GAP 80
-#define STAGE4_GAP 30
+#define STAGE3_GAP 450
+#define STAGE4_GAP 550
 #define STAGE1_TIME 3333
 #define STAGE2_TIME 3333
 #define STAGE3_TIME 3333
 #define STAGE4_TIME 2000
+
+#define STAGE1_ON_TIME  800
+#define STAGE1_OFF_TIME 200
+#define STAGE2_ON_TIME  450
+#define STAGE2_OFF_TIME 550
+#define STAGE3_ON_TIME  200
+#define STAGE3_OFF_TIME 800
+#define STAGE4_ON_TIME  3333
+#define STAGE4_OFF_TIME 2000
+
 
 /**
  * @brief Structure that will be sent over the queue.
@@ -103,6 +113,11 @@ typedef struct{
 
 
 
+typedef struct {
+    int on_time;
+    int off_time;
+} beep_timing_t;
+
 
 
 
@@ -121,7 +136,6 @@ typedef struct{
  * 
  */
 void hardware_init(void);
-void play_beep_blocking(int duration_ms);
 void stage1_task(void *pvParam);
 void stage1_slow_beeps();
 void stage2_task(void *pvParam);
@@ -132,7 +146,7 @@ void stage4_task(void *pvParam);
 void stage4_constant_tone();
 void sound_generator();
 void init_speeker_tasks(void);
-void play_beep_non_blocking(int duration_ms);
+void play_beep_non_blocking(int on_time_ms, int off_time_ms);
 
 QueueHandle_t get_hardware_send_queue(void);
 QueueHandle_t get_hardware_receive_queue(void);

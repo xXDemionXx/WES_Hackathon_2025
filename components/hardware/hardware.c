@@ -19,11 +19,10 @@ int car_back_distance_level = 0;    // Tells GUI how many bars to display
 static QueueHandle_t hardware_send_to_main = NULL;  // Queue handle for the queue that sends to main task
 QueueHandle_t hardware_receive_from_main = NULL;  // Queue handle for the queue that receives to hardware task
 
-static TaskHandle_t stage1_handle = NULL;
-static TaskHandle_t stage2_handle = NULL;
-static TaskHandle_t stage3_handle = NULL;
-static TaskHandle_t stage4_handle = NULL;
 
+static const beep_timing_t stage_1_time = {STAGE1_ON_TIME, STAGE1_OFF_TIME};
+static const beep_timing_t stage_2_time = {STAGE2_ON_TIME, STAGE2_OFF_TIME};
+static const beep_timing_t stage_3_time = {STAGE3_ON_TIME, STAGE3_OFF_TIME};
 
 
 //---------------------------------- LOCAL VARIABLES -----------------------------------
@@ -68,7 +67,7 @@ static void hardware_task(void *p_param)
                         vTaskSuspend(stage2_handle);
                         vTaskResume(stage3_handle);
                         */
-                       play_beep_non_blocking(700);
+                       play_beep_non_blocking(stage_1_time.on_time, stage_1_time.off_time);
                     break;
                     case 1:
                         /*
@@ -76,7 +75,7 @@ static void hardware_task(void *p_param)
                         vTaskResume(stage2_handle);
                         vTaskSuspend(stage3_handle);
                         */
-                       play_beep_non_blocking(250);
+                       play_beep_non_blocking(stage_2_time.on_time, stage_2_time.off_time);
                     break;
                     case 2:
                         /*
@@ -84,7 +83,7 @@ static void hardware_task(void *p_param)
                         vTaskSuspend(stage2_handle);
                         vTaskSuspend(stage3_handle);
                         */
-                       play_beep_non_blocking(75);
+                       play_beep_non_blocking(stage_3_time.on_time, stage_3_time.off_time);
                     break;
                     case 3:
                         /*
@@ -116,16 +115,7 @@ static void hardware_task(void *p_param)
     }
 }
 
-// --- Shared blocking tone generator ---
-void play_beep_blocking(int duration_ms) {
-    int samples = (SAMPLE_RATE * duration_ms) / 1000;
-    for (int i = 0; i < samples; i++) {
-        int value = 128 + (int)(127 * sin(2 * PI * TONE_FREQ * i / SAMPLE_RATE));
-        dac_output_voltage(DAC_CHANNEL_1, value);
-        ets_delay_us(1000000 / SAMPLE_RATE); // ~125us delay per sample
-    }
-}
-
+/*
 // --- Stage 1: Slow Beeps Task ---
 void stage1_task(void *pvParam) {
     int elapsed = 0;
@@ -136,63 +126,36 @@ void stage1_task(void *pvParam) {
     }
     vTaskDelete(NULL);
 }
-void stage1_slow_beeps() {
-    xTaskCreate(stage1_task, "stage1_task", 4096, NULL, 5, NULL);
-}
+    */
 
-// --- Stage 2: Medium Beeps Task ---
-void stage2_task(void *pvParam) {
-    (void)pvParam;
-    for(;;)
-    {
-        play_beep_blocking(BEEP_DURATION_MS);
-        vTaskDelay(pdMS_TO_TICKS(STAGE2_GAP));
-    }
-}
-
-// --- Stage 3: Fast Beeps Task ---
-void stage3_task(void *pvParam) {
-    (void)pvParam;
-    for(;;)
-    {
-        play_beep_blocking(BEEP_DURATION_MS);
-        vTaskDelay(pdMS_TO_TICKS(STAGE3_GAP));
-    }
-}
-
-// --- Stage 4: Constant Tone Task ---
-void stage4_task(void *pvParam) {
-    (void)pvParam;
-    for(;;)
-    {
-        play_beep_blocking(STAGE4_TIME);
-        vTaskDelay(pdMS_TO_TICKS(STAGE4_GAP));
-    }
-}
 
 static void beep_task(void *pvParameters) {
-    int duration_ms = *((int *)pvParameters);
-    int samples = (SAMPLE_RATE * duration_ms) / 1000;
+    beep_timing_t timing = *((beep_timing_t *)pvParameters);
     
+    int samples = (SAMPLE_RATE * timing.on_time) / 1000;  // Only for on_time
     dac_output_enable(DAC_CHANNEL_1);
 
     for (int i = 0; i < samples; i++) {
         int value = 128 + (int)(127 * sin(2 * PI * TONE_FREQ * i / SAMPLE_RATE));
         dac_output_voltage(DAC_CHANNEL_1, value);
-        ets_delay_us(1000000 / SAMPLE_RATE);
+        ets_delay_us(1000000 / SAMPLE_RATE);  // ~125us delay for 8kHz sample rate
     }
-
-    dac_output_voltage(DAC_CHANNEL_1, 0);  // Turn off tone
-    free(pvParameters);  // Free allocated memory for duration
-    vTaskDelete(NULL);   // Delete the task
+    
+    dac_output_voltage(DAC_CHANNEL_1, 0);
+    vTaskDelay(pdMS_TO_TICKS(timing.off_time));
+    
+    free(pvParameters);      // Clean up
+    vTaskDelete(NULL);       // Done
 }
 
-void play_beep_non_blocking(int duration_ms) {
-    int *duration = malloc(sizeof(int));
-    if (duration == NULL) return;
-    *duration = duration_ms;
-    
-    xTaskCreate(beep_task, "beep_task", 4096, duration, 5, NULL);
+void play_beep_non_blocking(int on_time_ms, int off_time_ms) {
+    beep_timing_t *timing = malloc(sizeof(beep_timing_t));
+    if (timing == NULL) return;
+
+    timing->on_time = on_time_ms;
+    timing->off_time = off_time_ms;
+
+    xTaskCreate(beep_task, "beep_task", 4096, timing, 5, NULL);
 }
 
 // --- app_main for testing ---
@@ -210,19 +173,6 @@ void sound_generator() {
 //============================================================
 
 void init_speeker_tasks(void){
-
-    xTaskCreate(&stage1_task, "stage1_task", 4096, NULL, 5, &stage1_handle);
-    xTaskCreate(&stage2_task, "stage2_task", 4096, NULL, 5, &stage2_handle);
-    xTaskCreate(&stage3_task, "stage3_task", 4096, NULL, 5, &stage3_handle);
-    xTaskCreate(&stage4_task, "stage4_task", 4096, NULL, 5, &stage4_handle);
-    // Suspend the tasks so they don't play right away
-    
-    vTaskSuspend(stage1_handle);
-    vTaskSuspend(stage2_handle);
-    vTaskSuspend(stage3_handle);
-    vTaskSuspend(stage4_handle);
-
-    //vTaskResume(stage4_handle);
 
     dac_output_enable(DAC_CHANNEL_1); // GPIO25
 
