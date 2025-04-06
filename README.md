@@ -1,4 +1,5 @@
 **Grupa 3Strojara**
+Karlo Šarić, Demion Šavrljuga, Karlo Crikvenčić
 
 Infotainment almost-casino
 

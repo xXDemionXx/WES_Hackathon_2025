@@ -30,10 +30,10 @@ static void main_task(void *p_param);
 //Hardware
 QueueHandle_t queue_from_hardware = NULL;   // Queue handle for the queue that receives from hardware task
 QueueHandle_t queue_for_hardware = NULL;    // Queue handle for the queue that sends to hardware task
-hardware_send_queue_data_t hardware_data;
-hardware_receive_queue_data_t data_for_hardware;
+hardware_send_queue_data_t hardware_data;           // Data that is received from the hardware task
+hardware_receive_queue_data_t data_for_hardware;    // Data that is sent to hardware task
  
-QueueHandle_t s_queue_handle = NULL;
+QueueHandle_t gui_queue_handle = NULL;
  
 //GUI
 QueueHandle_t queue_from_gui = NULL;        // Queue handle for the queue that receives from gui task
@@ -49,13 +49,14 @@ static const char *TAG = "main task";
  
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
 void app_main(void)
-{
+{   
+    // Init all the peripheral tasks
     gui_init();
     hardware_init();
-    //wifi_init();
  
-    s_queue_handle = xQueueCreate(5, sizeof(uint32_t));
-    if (NULL == s_queue_handle)
+    // Create GUI queue
+    gui_queue_handle = xQueueCreate(5, sizeof(uint32_t));
+    if (NULL == gui_queue_handle)
      {
          ESP_LOGE(TAG, "Failed to create queue");
          return;
@@ -90,7 +91,7 @@ static void main_task(void *p_param)
                 danger_lv = hardware_data.data.ultrasonic_data.distance;
                 printf("Received from hardware task: %d\n", danger_lv);
                  // Send data to GUI
-                if (xQueueSend(s_queue_handle, &danger_lv, pdMS_TO_TICKS(WAIT_FOR_QUEUE))) {
+                if (xQueueSend(gui_queue_handle, &danger_lv, pdMS_TO_TICKS(WAIT_FOR_QUEUE))) {
                     printf("Test send to GUI\n");
                 }
 

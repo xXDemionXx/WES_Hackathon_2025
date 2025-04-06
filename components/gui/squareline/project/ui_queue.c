@@ -4,7 +4,7 @@
 #include "ui.h"
 
 /* Declare the external queue handle defined in app_main.c */
-extern QueueHandle_t s_queue_handle;
+extern QueueHandle_t gui_queue_handle;
 
 #ifndef TASK_DELAY_MS
 #define TASK_DELAY_MS (1000U)
@@ -21,7 +21,7 @@ void ui_queue_task(void *p_param)
     {
     
         // Receive data from GUI
-        if (xQueueReceive(s_queue_handle, &car_danger_level, pdMS_TO_TICKS(10))) {
+        if (xQueueReceive(gui_queue_handle, &car_danger_level, pdMS_TO_TICKS(10))) {
             printf("Received from gui task: %d\n", car_danger_level);
 
             lv_obj_clear_flag(ui_smallarcr, LV_OBJ_FLAG_HIDDEN);
